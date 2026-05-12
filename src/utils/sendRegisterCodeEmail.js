@@ -67,26 +67,30 @@ Cảm ơn bạn đã sử dụng DevChill!
       </div>
 
       <div style="background:#f5f5f5;padding:15px;text-align:center;font-size:12px;color:#777">
-        © ${new Date().getFullYear()} DevChill. All rights reserved.
+        © 2026 DevChill. All rights reserved.
       </div>
 
     </div>
     `;
 
-    // Gọi API Resend để gửi
-    const data = await resend.emails.send({
-      from: `"DevChill" <onboarding@resend.dev>`, // Đang dùng email test của Resend
+    // Gọi API Resend để gửi mail
+    const { data, error } = await resend.emails.send({
+      from: "DevChill <onboarding@resend.dev>", // Bắt buộc dùng email này khi chưa có domain riêng
       to: toEmail,
       subject: "Mã xác thực đăng ký DevChill",
       text: emailText,
       html: emailHtml,
     });
 
-    console.log(
-      `[MAILER] Gửi OTP đến ${toEmail} thành công. Resend ID: ${data?.id}`,
-    );
+    if (error) {
+      console.error("Lỗi từ Resend API:", error);
+      throw new Error(error.message);
+    }
+
+    console.log(`Gửi OTP đến ${toEmail} thành công! ID:`, data?.id);
+    return true;
   } catch (err) {
-    console.error("[MAILER ERROR] Gửi email thất bại:", err);
-    throw new Error("Không thể gửi email, kiểm tra cấu hình Resend");
+    console.error("Gửi email thất bại:", err);
+    throw new Error("Không thể gửi email, kiểm tra lại Resend API");
   }
 };
