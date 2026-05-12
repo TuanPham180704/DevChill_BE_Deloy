@@ -15,7 +15,7 @@ import adminMovieRoutes from "./routes/Admin/movieAdminRoutes.js";
 import adminPlanRoutes from "./routes/Admin/adminPlanRoutes.js";
 import adminShowimeRoutes from "./routes/Admin/showtimeRoutes.js";
 import adminSupportRoutes from "./routes/Admin/supportRoutes.js";
-import paymentRoutes from "./routes/admin/paymentRoutes.js";
+import paymentRoutes from "./routes/Admin/paymentRoutes.js";
 
 import planRoutes from "./routes/Users/userPlanRoutes.js";
 import profileRoutes from "./routes/Users/userRoutes.js";
