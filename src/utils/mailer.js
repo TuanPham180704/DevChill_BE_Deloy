@@ -1,4 +1,7 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+// Khởi tạo Resend với API Key từ biến môi trường của bạn
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendSupportReplyEmail = async (
   toEmail,
@@ -9,33 +12,25 @@ export const sendSupportReplyEmail = async (
   if (!toEmail) return;
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
     const statusMap = {
       open: "Đang chờ xử lý",
       in_progress: "Đang xử lý",
       resolved: "Đã giải quyết",
       closed: "Đã đóng",
     };
+
     const displayStatus = statusMap[statusUpdated] || statusUpdated;
     const statusColor =
       statusUpdated === "resolved"
-        ? "#28a745" 
+        ? "#28a745"
         : statusUpdated === "in_progress"
-          ? "#1e90ff" 
+          ? "#1e90ff"
           : "#6c757d";
 
     const emailHtml = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;border:1px solid #eee;border-radius:10px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,0.05)">
       
-      <!-- Header giống form Register -->
+      <!-- Header -->
       <div style="background:#1e90ff;color:#fff;padding:25px 20px;text-align:center">
         <h1 style="margin:0;font-size:26px;letter-spacing:1px;">DevChill 🎬</h1>
         <p style="margin:8px 0 0 0;font-size:15px;opacity:0.9;">Trung Tâm Hỗ Trợ Khách Hàng</p>
@@ -79,7 +74,7 @@ export const sendSupportReplyEmail = async (
         </p>
       </div>
 
-      <!-- Footer y hệt Register -->
+      <!-- Footer -->
       <div style="background:#f5f5f5;padding:20px;text-align:center;font-size:12px;color:#777;border-top:1px solid #eee;">
         <p style="margin:0 0 5px 0;">Email này được gửi tự động từ hệ thống DevChill. Vui lòng không trả lời trực tiếp.</p>
         <p style="margin:0;">© ${new Date().getFullYear()} DevChill. All rights reserved.</p>
@@ -88,15 +83,18 @@ export const sendSupportReplyEmail = async (
     </div>
     `;
 
-    await transporter.sendMail({
-      from: `"DevChill Support" <${process.env.EMAIL_USER}>`,
+    // Gọi API của Resend để gửi thư
+    const data = await resend.emails.send({
+      from: "DevChill Support <onboarding@resend.dev>",
       to: toEmail,
       subject: `[DevChill] Cập nhật yêu cầu hỗ trợ #${ticketCode}`,
       html: emailHtml,
     });
 
-    console.log(`[MAILER] Đã gửi phản hồi ticket ${ticketCode} tới ${toEmail}`);
+    console.log(
+      `[MAILER] Đã gửi phản hồi ticket ${ticketCode} tới ${toEmail}. Resend ID: ${data?.id}`,
+    );
   } catch (err) {
-    console.error("Gửi email hỗ trợ thất bại:", err);
+    console.error("[MAILER ERROR] Gửi email hỗ trợ thất bại:", err);
   }
 };
