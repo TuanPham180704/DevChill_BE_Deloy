@@ -1,6 +1,5 @@
 import pool from "../../config/db.js";
 import cron from "node-cron";
-import { io } from "../../server.js";
 
 const getDurationInMinutes = (durationStr) => {
   if (!durationStr) return 120;
@@ -183,6 +182,7 @@ export const updateShowtime = async (id, data) => {
     `UPDATE showtimes SET ${fields.join(", ")}, updated_at = NOW() WHERE id = $${i} RETURNING *`,
     values,
   );
+  const { io } = await import("../../server.js");
   if (data.status && data.status !== current.status && io) {
     io.to(`room_premiere_${id}`).emit("room_status_changed", {
       roomId: parseInt(id),
@@ -195,6 +195,7 @@ export const updateShowtime = async (id, data) => {
 
 cron.schedule("* * * * *", async () => {
   try {
+    const { io } = await import("../../server.js");
     const liveUpdate = await pool.query(`
       UPDATE showtimes 
       SET status = 'live', updated_at = NOW() 

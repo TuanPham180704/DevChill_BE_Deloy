@@ -1,6 +1,5 @@
 import pool from "../../config/db.js";
 import cron from "node-cron";
-import { io } from "../../server.js";
 
 export const getPublicShowtimes = async (query = {}) => {
   const limit = Math.min(parseInt(query.limit) || 12, 50);
