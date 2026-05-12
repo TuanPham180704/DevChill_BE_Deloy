@@ -13,7 +13,7 @@ import adminUserRoutes from "./routes/Admin/userAdRoutes.js";
 import adminContractRoutes from "./routes/Admin/contractRoutes.js";
 import adminMovieRoutes from "./routes/Admin/movieAdminRoutes.js";
 import adminPlanRoutes from "./routes/Admin/adminPlanRoutes.js";
-import adminShowimeRoutes from "./routes/Admin/showtimeRoutes.js";
+import adminShowtimeRoutes from "./routes/Admin/showtimeRoutes.js";
 import adminSupportRoutes from "./routes/Admin/supportRoutes.js";
 import paymentRoutes from "./routes/Admin/paymentRoutes.js";
 
@@ -31,7 +31,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://dev-chill-fe.vercel.app",
+    origin: ["https://dev-chill-fe.vercel.app", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true,
   }),
 );
@@ -50,7 +52,7 @@ app.use("/api/admin/contracts", adminContractRoutes);
 app.use("/api/admin/movies", adminMovieRoutes);
 app.use("/api/admin/plans", adminPlanRoutes);
 app.use("/api/admin/payments", paymentRoutes);
-app.use("/api/admin/showtimes", adminShowimeRoutes);
+app.use("/api/admin/showtimes", adminShowtimeRoutes);
 app.use("/api/admin/support", adminSupportRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/plans", planRoutes);
