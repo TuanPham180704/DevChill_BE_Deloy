@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config"; // Cú pháp chuẩn cho ES Modules để load biến môi trường ngay lập tức
 import http from "http";
 import { Server } from "socket.io";
 import app from "./app.js";
@@ -18,6 +17,9 @@ export const io = new Server(server, {
   pingTimeout: 60000,
 });
 
+// Gắn io vào app để các Controller có thể lấy ra dùng (tránh lỗi vòng lặp)
+app.set("io", io);
+
 const updateViewerCount = (roomName) => {
   const clientsInRoom = io.sockets.adapter.rooms.get(roomName);
   const count = clientsInRoom ? clientsInRoom.size : 0;
@@ -26,6 +28,7 @@ const updateViewerCount = (roomName) => {
 
 io.on("connection", (socket) => {
   console.log(`[Socket] Client connected: ${socket.id}`);
+
   socket.on("join_premiere_room", async (data) => {
     const roomName =
       typeof data === "string" ? data : `room_premiere_${data.roomId}`;
@@ -84,9 +87,11 @@ io.on("connection", (socket) => {
     socket.leave(roomName);
     updateViewerCount(roomName);
   });
+
   socket.on("ask_ai_bot", (data) => {
     chatAI(socket, data);
   });
+
   socket.on("disconnecting", () => {
     socket.rooms.forEach((roomName) => {
       if (roomName.startsWith("room_premiere_")) {
